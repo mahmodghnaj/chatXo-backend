@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guard/jwt-auth.guard';
+import { RoomModule } from './modules/room/room.module';
+import { FriendsModule } from './modules/friends/friends.module';
 
 @Module({
   imports: [
@@ -14,9 +16,11 @@ import { JwtAuthGuard } from './modules/auth/guard/jwt-auth.guard';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DATA_BASE),
+    FriendsModule,
     UsersModule,
     ChatsModule,
     AuthModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [
