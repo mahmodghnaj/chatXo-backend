@@ -4,8 +4,10 @@ import {
   Get,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { Public } from 'src/decorators/public';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
@@ -15,17 +17,33 @@ import { RefreshTokenGuard } from './guard/refresh-token.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @Public()
   @Post('register')
-  async register(@Body() body: CreateUserDto) {
-    return await this.authService.register(body);
+  async register(
+    @Body() body: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await await this.authService.register(body);
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    return tokens;
   }
+
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    return await this.authService.login(req.user);
+  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+    const tokens = await this.authService.login(req.user);
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    return tokens;
   }
+
   @Public()
   @UseGuards(RefreshTokenGuard)
   @Get('refresh-token')
