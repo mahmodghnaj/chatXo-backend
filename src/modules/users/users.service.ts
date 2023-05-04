@@ -25,7 +25,7 @@ export class UsersService {
       .select(['-password', '-refreshToken']);
     return user;
   }
-  async validateEmail(body: object) {
+  async validateUser(body: object) {
     const user = await this.usersModel.findOne(body);
     return user;
   }

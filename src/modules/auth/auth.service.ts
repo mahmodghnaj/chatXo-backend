@@ -17,14 +17,14 @@ export class AuthService {
     return await this.getToken(body);
   }
   async refreshToken(id, rt) {
-    const user = await this.usersService.findOne({ _id: id });
+    const user = await this.usersService.validateUser({ _id: id });
     if (user.refreshToken != rt) {
       throw new HttpException('Unauthorized', 401);
     }
     return await this.getToken(user);
   }
-  async validateUser(body) {
-    const user = await this.usersService.validateEmail({
+  async validate(body) {
+    const user = await this.usersService.validateUser({
       email: body.email,
     });
     let isMatch: boolean;
