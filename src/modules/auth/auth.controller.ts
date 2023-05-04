@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
   Request,
   Res,
@@ -35,6 +36,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @HttpCode(200)
   async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.authService.login(req.user);
     res.cookie('refreshToken', tokens.refreshToken, {
