@@ -49,11 +49,19 @@ export class AuthController {
   @Public()
   @UseGuards(RefreshTokenGuard)
   @Get('refresh-token')
-  async refreshToken(@Request() req) {
-    return await this.authService.refreshToken(
+  async refreshToken(
+    @Request() req,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.authService.refreshToken(
       req.user.id,
       req.user.refreshToken,
     );
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    return tokens;
   }
   @Get('me')
   async me(@Request() re) {
