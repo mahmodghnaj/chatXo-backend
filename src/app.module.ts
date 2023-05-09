@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { UsersModule } from './modules/users/users.module';
 import { ChatsModule } from './modules/chats/chats.module';
@@ -9,6 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/guard/jwt-auth.guard';
 import { RoomModule } from './modules/room/room.module';
 import { FriendsModule } from './modules/friends/friends.module';
+import { AppLoggerMiddleware } from './middleware/AppLoggerMiddleware';
 
 @Module({
   imports: [
@@ -30,4 +31,8 @@ import { FriendsModule } from './modules/friends/friends.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(AppLoggerMiddleware).forRoutes('*');
+  }
+}
