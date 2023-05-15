@@ -20,20 +20,20 @@ export class UsersService {
     return `This action returns all users`;
   }
   async findOne(body: object) {
-    const user = await this.usersModel
-      .findOne(body)
-      .select(['-password', '-refreshToken']);
+    const user = await this.usersModel.findOne(body);
+
     return user;
   }
   async validateUser(body: object) {
-    const user = await this.usersModel.findOne(body);
+    const user = await this.usersModel
+      .findOne(body)
+      .select('+password +refreshToken')
+      .exec();
     return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.usersModel
-      .findByIdAndUpdate(id, updateUserDto)
-      .select(['-password', '-refreshToken']);
+    const user = await this.usersModel.findByIdAndUpdate(id, updateUserDto);
     return user;
   }
 
