@@ -46,15 +46,16 @@ export class RoomService {
       .populate('user2')
       .skip(skip)
       .limit(limit);
+    let allTotal;
     if (total) {
-      const allTotal = await this.roomsModel.countDocuments();
-      return {
-        data: data,
-        total: allTotal,
-      };
+      allTotal = await this.roomsModel.countDocuments();
     }
     return {
-      data: data,
+      data: data.map((item) => ({
+        id: item.id,
+        user: userId == item.user1 ? item.user1 : item.user2,
+      })),
+      total: allTotal,
     };
   }
 }
