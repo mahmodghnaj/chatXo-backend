@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './modules/auth/guard/jwt-auth.guard';
 import { RoomModule } from './modules/room/room.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { AppLoggerMiddleware } from './middleware/AppLoggerMiddleware';
+import { PaginationMiddleware } from './middleware/pagination.middleware';
 
 @Module({
   imports: [
@@ -34,5 +35,6 @@ import { AppLoggerMiddleware } from './middleware/AppLoggerMiddleware';
 export class AppModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(AppLoggerMiddleware).forRoutes('*');
+    consumer.apply(PaginationMiddleware).forRoutes('*');
   }
 }

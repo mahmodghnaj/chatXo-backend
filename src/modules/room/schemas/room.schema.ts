@@ -8,9 +8,9 @@ export type RoomDocument = HydratedDocument<Room>;
 @Schema({ timestamps: true })
 export class Room {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
-  user: User[];
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Messages' })
-  messages: Message[];
+  user1: User;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
+  user2: User;
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 RoomSchema.set('toJSON', {

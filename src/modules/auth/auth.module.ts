@@ -16,5 +16,6 @@ import { RefreshToken } from './strategie/refresh-token';
       secret: process.env.SECRET,
     }),
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}

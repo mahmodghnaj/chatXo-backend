@@ -9,11 +9,22 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
+  verifyAccessToken(accessToken: string) {
+    try {
+      const payload = this.jwtService.verify(accessToken, {
+        secret: process.env.SECRET,
+      });
+
+      return payload;
+    } catch (err) {
+      return null;
+    }
+  }
   async register(body: CreateUserDto) {
     const user = await this.usersService.create(body);
     return await this.getToken(user);
   }
-  async login(body: CreateUserDto) {
+  async login(body) {
     return await this.getToken(body);
   }
   async refreshToken(id, rt) {
