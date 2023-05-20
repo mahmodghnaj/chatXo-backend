@@ -58,4 +58,26 @@ export class RoomService {
       total: allTotal,
     };
   }
+
+  async update(id: string, updateRoomDto) {
+    const room = await this.roomsModel.findByIdAndUpdate(id, updateRoomDto);
+    return room;
+  }
+  async getMessagesChat(id, query) {
+    const { page, limit, total } = query;
+    const skip = (page - 1) * limit;
+    const data = await this.messagesModel
+      .find({ room: id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    let allTotal;
+    if (total) {
+      allTotal = await this.messagesModel.countDocuments({ room: id });
+    }
+    return {
+      data,
+      total: allTotal,
+    };
+  }
 }

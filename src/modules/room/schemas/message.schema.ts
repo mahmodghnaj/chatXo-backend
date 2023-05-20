@@ -13,6 +13,8 @@ export class Message {
   user: User;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Rooms' })
   room: Room;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
+  receiver: User;
 }
 export const MessageSchema = SchemaFactory.createForClass(Message);
 MessageSchema.set('toJSON', {

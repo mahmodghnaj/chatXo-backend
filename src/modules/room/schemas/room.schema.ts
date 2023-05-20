@@ -11,6 +11,12 @@ export class Room {
   user1: User;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
   user2: User;
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Messages',
+    nullable: true,
+  })
+  lastMessage: Message[] | null;
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
 RoomSchema.set('toJSON', {

@@ -6,8 +6,11 @@ export class AddMessageDto {
   text: string;
   @IsNotEmpty()
   @IsMongoId()
-  roomId: string;
+  room: string;
+  @IsNotEmpty()
+  @IsMongoId()
+  receiver: string;
   @IsOptional()
   @IsMongoId()
-  userId?: string;
+  user?: string;
 }

@@ -18,6 +18,8 @@ export class User {
   refreshToken: string;
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Friends' })
   friends: Array<Friends>;
+  @Prop({ enum: ['Online', 'Offline'], default: 'Offline' })
+  status: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.set('toJSON', {

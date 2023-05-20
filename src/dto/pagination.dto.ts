@@ -6,7 +6,7 @@ import { validate } from 'class-validator';
 export class PaginationValidationPipe implements PipeTransform<any> {
   async transform(value: any) {
     const page = parseInt(value.page, 10) || 1;
-    const limit = parseInt(value.limit, 10) || 10;
+    const limit = parseInt(value.limit, 10) || 50;
 
     if (page < 1) {
       throw new BadRequestException('Page must be greater than or equal to 1');
