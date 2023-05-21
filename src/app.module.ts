@@ -12,12 +12,19 @@ import { FriendsModule } from './modules/friends/friends.module';
 import { AppLoggerMiddleware } from './middleware/AppLoggerMiddleware';
 import { PaginationMiddleware } from './middleware/pagination.middleware';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mongoPlugin = require('./utilities/common/mongo-plugin');
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.DATA_BASE),
+    MongooseModule.forRoot(process.env.DATA_BASE, {
+      connectionFactory: (connection) => {
+        connection.plugin(mongoPlugin);
+        return connection;
+      },
+    }),
     FriendsModule,
     UsersModule,
     ChatsModule,

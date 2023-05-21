@@ -22,10 +22,3 @@ export class User {
   status: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.set('toJSON', {
-  transform: (document, object) => {
-    object.id = object._id.toString();
-    delete object._id;
-    delete object.__v;
-  },
-});

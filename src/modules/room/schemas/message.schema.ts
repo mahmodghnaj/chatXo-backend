@@ -17,10 +17,3 @@ export class Message {
   receiver: User;
 }
 export const MessageSchema = SchemaFactory.createForClass(Message);
-MessageSchema.set('toJSON', {
-  transform: (document, object) => {
-    object.id = object._id.toString();
-    delete object._id;
-    delete object.__v;
-  },
-});
