@@ -20,7 +20,14 @@ export class UsersService {
     return `This action returns all users`;
   }
   async findOne(body: object) {
-    const user = await this.usersModel.findOne(body);
+    const user = await this.usersModel.findOne(body).populate({
+      path: 'friends',
+      populate: {
+        path: 'requester recipient',
+        model: 'Users',
+        select: 'firstName lastName email',
+      },
+    });
 
     return user;
   }
@@ -33,7 +40,9 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto) {
-    const user = await this.usersModel.findByIdAndUpdate(id, updateUserDto);
+    const user = await this.usersModel.findByIdAndUpdate(id, updateUserDto, {
+      new: true,
+    });
     return user;
   }
 

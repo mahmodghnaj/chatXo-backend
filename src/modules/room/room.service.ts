@@ -14,7 +14,7 @@ export class RoomService {
     @InjectModel('Messages') private messagesModel: Model<Message>,
     private usersService: UsersService,
   ) {}
-  async createRoom(body): Promise<RoomDocument> {
+  async createRoom(body): Promise<any> {
     if (body.user1 == body.user2)
       throw new HttpException("Can't Add Room With Mine", 400);
     const user = await this.usersService.findOne({ _id: body.user2 });
@@ -31,7 +31,12 @@ export class RoomService {
     if (room.filter((item) => item).length)
       throw new HttpException('Room Between Users Already Found', 400);
     const createdRoom = new this.roomsModel(body);
-    return await createdRoom.save();
+    await createdRoom.populate('user2');
+    const res = await createdRoom.save();
+    return {
+      id: res.id,
+      user: res.user2,
+    };
   }
   async addMessage(body: AddMessageDto): Promise<MessageDocument> {
     const createdMessage = new this.messagesModel(body);
@@ -41,19 +46,23 @@ export class RoomService {
     const { page, limit, total } = query;
     const skip = (page - 1) * limit;
     const data = await this.roomsModel
-      .find()
+      .find({
+        $or: [{ user1: userId }, { user2: userId }],
+      })
       .populate('user1')
       .populate('user2')
       .skip(skip)
       .limit(limit);
     let allTotal;
     if (total) {
-      allTotal = await this.roomsModel.countDocuments();
+      allTotal = await this.roomsModel.countDocuments({
+        $or: [{ user1: userId }, { user2: userId }],
+      });
     }
     return {
       data: data.map((item) => ({
         id: item.id,
-        user: userId == item.user1 ? item.user1 : item.user2,
+        user: userId == item.user1._id ? item.user2 : item.user1,
       })),
       total: allTotal,
     };
@@ -78,6 +87,26 @@ export class RoomService {
     return {
       data,
       total: allTotal,
+    };
+  }
+  async checkRoom(friendId, userId) {
+    const room = await this.roomsModel
+      .findOne({
+        $or: [
+          { user1: friendId, user2: userId },
+          { user1: userId, user2: friendId },
+        ],
+      })
+      .populate('user1')
+      .populate('user2');
+
+    return {
+      room: room
+        ? {
+            id: room.id,
+            user: userId == room.user1._id ? room.user2 : room.user1,
+          }
+        : null,
     };
   }
 }

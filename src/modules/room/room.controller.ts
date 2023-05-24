@@ -39,4 +39,8 @@ export class RoomController {
   }
   @Delete(':id')
   deleteRooms() {}
+  @Get('/check/:id') //friend Id
+  checkRoom(@Param() params: OnlyIDParamDTO, @Req() req) {
+    return this.roomService.checkRoom(params.id, req.user.id);
+  }
 }
