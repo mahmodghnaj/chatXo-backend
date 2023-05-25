@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AddMessageDto } from '../chats/dto/add-message.dto';
 import { UsersService } from '../users/users.service';
-import { CreatedRoomDto } from './dto/add-room.dto';
 import { Message, MessageDocument } from './schemas/message.schema';
 import { Room, RoomDocument } from './schemas/room.schema';
 
@@ -32,10 +31,12 @@ export class RoomService {
       throw new HttpException('Room Between Users Already Found', 400);
     const createdRoom = new this.roomsModel(body);
     await createdRoom.populate('user2');
-    const res = await createdRoom.save();
+    const res: RoomDocument = await createdRoom.save();
     return {
       id: res.id,
       user: res.user2,
+      createdAt: res.createdAt,
+      updatedAt: res.updatedAt,
     };
   }
   async addMessage(body: AddMessageDto): Promise<MessageDocument> {
@@ -52,7 +53,8 @@ export class RoomService {
       .populate('user1')
       .populate('user2')
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ updatedAt: -1 });
     let allTotal;
     if (total) {
       allTotal = await this.roomsModel.countDocuments({
@@ -90,7 +92,7 @@ export class RoomService {
     };
   }
   async checkRoom(friendId, userId) {
-    const room = await this.roomsModel
+    const room: RoomDocument = await this.roomsModel
       .findOne({
         $or: [
           { user1: friendId, user2: userId },
@@ -105,6 +107,8 @@ export class RoomService {
         ? {
             id: room.id,
             user: userId == room.user1._id ? room.user2 : room.user1,
+            createdAt: room.createdAt,
+            updatedAt: room.updatedAt,
           }
         : null,
     };

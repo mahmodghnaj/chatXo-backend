@@ -4,17 +4,20 @@ import { Response } from 'express';
 @Catch(MongoError)
 export class MongoExceptionFilter implements ExceptionFilter {
   catch(exception: MongoError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
     switch (exception.code) {
       case 11000:
-        const ctx = host.switchToHttp();
-        const response = ctx.getResponse<Response>();
         response.status(409).json({
           statusCode: 409,
           message: 'Email Already Exists',
         });
         break;
       default:
-        console.log(response);
+        response.status(409).json({
+          statusCode: 409,
+          message: exception.message,
+        });
     }
   }
 }

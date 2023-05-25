@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Request } from '@nestjs/common';
+import { Body, Controller, Patch, Post, Request } from '@nestjs/common';
 import { AddFriendDto } from './dto/add-friend.dto';
 import { FriendsService } from './friends.service';
 
@@ -9,11 +9,11 @@ export class FriendsController {
   addFriend(@Request() req, @Body() body: AddFriendDto) {
     return this.friendsService.addFriend(req.user.id, body.idFriend);
   }
-  @Post('accept')
+  @Patch('accept')
   acceptFriend(@Request() req, @Body() body: AddFriendDto) {
     return this.friendsService.acceptFriend(req.user.id, body.idFriend);
   }
-  @Post('reject')
+  @Patch('reject')
   rejectFriend(@Request() req, @Body() body: AddFriendDto) {
     return this.friendsService.rejectFriend(req.user.id, body.idFriend);
   }

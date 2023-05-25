@@ -49,4 +49,19 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+  async searchUsers(query: string): Promise<{ data: User[] }> {
+    if (!query)
+      return {
+        data: [],
+      };
+    const users = await this.usersModel.find({
+      $or: [
+        { firstName: { $regex: query, $options: 'i' } },
+        { lastName: { $regex: query, $options: 'i' } },
+      ],
+    });
+    return {
+      data: users,
+    };
+  }
 }

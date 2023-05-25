@@ -43,7 +43,9 @@ export class FriendsService {
       { $set: { status: 3 } },
     );
     if (!docB) throw new HttpException('Friend Not Found', 400);
-    return 'ok';
+    return {
+      friendId: friendId,
+    };
   }
   async rejectFriend(userId, friendId) {
     const docA = await this.friendsModel.findOneAndRemove({
@@ -58,6 +60,8 @@ export class FriendsService {
     if (!docB) throw new HttpException('Friend Not Found', 400);
     await this.usersService.update(userId, { $pull: { friends: docA._id } });
     await this.usersService.update(friendId, { $pull: { friends: docB._id } });
-    return 'ok';
+    return {
+      friendId: friendId,
+    };
   }
 }

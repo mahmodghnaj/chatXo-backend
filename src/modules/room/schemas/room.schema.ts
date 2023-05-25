@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, SchemaTimestampsConfig } from 'mongoose';
 import { UserDocument } from 'src/modules/users/schemas/user.schema';
 import { Message, MessageDocument } from './message.schema';
 
-export type RoomDocument = HydratedDocument<Room>;
+export type RoomDocument = HydratedDocument<Room> & SchemaTimestampsConfig;
 
 @Schema({ timestamps: true })
 export class Room {
@@ -11,11 +11,5 @@ export class Room {
   user1: UserDocument;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
   user2: UserDocument;
-  @Prop({
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Messages',
-    nullable: true,
-  })
-  lastMessage: MessageDocument[] | null;
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);
