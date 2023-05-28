@@ -49,7 +49,7 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
-  async searchUsers(query: string): Promise<{ data: User[] }> {
+  async searchUsers(query: string, userId: string): Promise<{ data: User[] }> {
     if (!query)
       return {
         data: [],
@@ -61,7 +61,7 @@ export class UsersService {
       ],
     });
     return {
-      data: users,
+      data: users.filter((item) => item.id != userId),
     };
   }
 }

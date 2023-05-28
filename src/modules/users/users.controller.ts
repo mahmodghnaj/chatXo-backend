@@ -42,8 +42,8 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
   @Get('/search')
-  async searchUsers(@Query('name') query: string) {
-    const users = await this.usersService.searchUsers(query);
+  async searchUsers(@Query('name') query: string, @Req() req) {
+    const users = await this.usersService.searchUsers(query, req.user.id);
     return users;
   }
 }
