@@ -13,4 +13,6 @@ export class AddMessageDto {
   @IsOptional()
   @IsMongoId()
   user?: string;
+  @IsOptional()
+  received?: boolean;
 }

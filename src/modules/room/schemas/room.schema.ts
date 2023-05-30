@@ -11,5 +11,7 @@ export class Room {
   user1: UserDocument;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
   user2: UserDocument;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Messages' })
+  lastMessage: MessageDocument;
 }
 export const RoomSchema = SchemaFactory.createForClass(Room);

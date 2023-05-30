@@ -25,7 +25,7 @@ export class UsersService {
       populate: {
         path: 'requester recipient',
         model: 'Users',
-        select: 'firstName lastName email',
+        select: 'firstName lastName email status lastSeenAt',
       },
     });
 

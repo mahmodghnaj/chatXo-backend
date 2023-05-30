@@ -33,9 +33,13 @@ export class RoomController {
   getRooms(@Query() pagination, @Req() req) {
     return this.roomService.getRooms(pagination, req.user.id);
   }
-  @Get(':id')
+  @Get('/message/:id')
   getMessagesChat(@Param() params: OnlyIDParamDTO, @Query() pagination) {
     return this.roomService.getMessagesChat(params.id, pagination);
+  }
+  @Get(':id')
+  getById(@Param() params: OnlyIDParamDTO, @Req() req) {
+    return this.roomService.findOne(params.id, req.user.id);
   }
   @Delete(':id')
   deleteRooms() {}

@@ -20,5 +20,7 @@ export class User {
   friends: Array<Friends>;
   @Prop({ enum: ['Online', 'Offline'], default: 'Offline' })
   status: string;
+  @Prop()
+  lastSeenAt: Date;
 }
 export const UserSchema = SchemaFactory.createForClass(User);

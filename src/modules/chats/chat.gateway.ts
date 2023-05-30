@@ -39,17 +39,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const payload = this.authService.verifyAccessToken(token);
     const user =
       payload &&
-      (await this.userService.update(payload.id, { status: 'Online' }));
+      (await this.userService.update(payload.id, {
+        status: 'Online',
+      }));
     if (!user) {
       client.disconnect(true);
       return;
     }
     this.connectedUsers.set(client.id, user.id);
+    await this.roomService.markMessagesAsReceived(user.id);
+    this.notifyConnectedUsers({
+      id: user.id,
+      status: 'Online',
+      lastSeenAt: undefined,
+    });
   }
   async handleDisconnect(client) {
     const userId: string = this.connectedUsers.get(client.id);
-    await this.userService.update(userId, { status: 'Offline' });
+    await this.userService.update(userId, {
+      status: 'Offline',
+      lastSeenAt: new Date(),
+    });
     this.connectedUsers.delete(client.id);
+    this.notifyConnectedUsers({
+      id: userId,
+      status: 'Offline',
+      lastSeenAt: new Date(),
+    });
   }
   @SubscribeMessage('message')
   async onMessage(client: Socket, addMessageDto: AddMessageDto) {
@@ -59,20 +75,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       addMessageDto.receiver,
     );
     addMessageDto.user = userId;
+    addMessageDto.received = receiverId ? true : false;
     const message = await this.roomService.addMessage(addMessageDto);
+    await this.roomService.update(addMessageDto.room, {
+      lastMessage: message,
+      updatedAt: new Date(),
+    });
     // receiver is online
     if (receiverId)
-      this.server
-        .to(receiverId)
-        .to(client.id)
-        .emit('message', { text: addMessageDto.text, online: true });
-    else {
-      await this.roomService.update(addMessageDto.room, {
-        $addToSet: { lastMessage: message },
+      this.server.to(receiverId).to(client.id).emit('message', {
+        message,
+        idRoom: addMessageDto.room,
       });
-      this.server
-        .to(client.id)
-        .emit('message', { text: addMessageDto.text, online: false });
+    else {
+      this.server.to(client.id).emit('message', {
+        message,
+        idRoom: addMessageDto.room,
+      });
     }
+  }
+  private notifyConnectedUsers({ id, status, lastSeenAt }) {
+    // Send a notification to other connected sockets
+    this.connectedUsers.forEach((connectedUserId, key) => {
+      if (connectedUserId !== id) {
+        this.server.to(key).emit('statusUser', { id, status, lastSeenAt });
+      }
+    });
   }
 }

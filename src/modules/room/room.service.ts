@@ -52,6 +52,7 @@ export class RoomService {
       })
       .populate('user1')
       .populate('user2')
+      .populate('lastMessage')
       .skip(skip)
       .limit(limit)
       .sort({ updatedAt: -1 });
@@ -65,6 +66,7 @@ export class RoomService {
       data: data.map((item) => ({
         id: item.id,
         user: userId == item.user1._id ? item.user2 : item.user1,
+        lastMessage: item.lastMessage,
       })),
       total: allTotal,
     };
@@ -112,5 +114,27 @@ export class RoomService {
           }
         : null,
     };
+  }
+  async findOne(id: string, userId: string) {
+    const res = await this.roomsModel
+      .findById(id)
+      .populate('user1')
+      .populate('user2')
+      .populate('lastMessage');
+    if (res.user1.id == userId || res.user2.id == userId)
+      return {
+        id: res.id,
+        user: userId == res.user1.id ? res.user2 : res.user1,
+        lastMessage: res.lastMessage,
+      };
+    throw new HttpException('this is room is private', 400);
+  }
+  async markMessagesAsReceived(receiverId: string): Promise<string> {
+    await this.messagesModel.updateMany(
+      { receiver: receiverId, received: false },
+      { $set: { received: true } },
+    );
+
+    return 'ok';
   }
 }
