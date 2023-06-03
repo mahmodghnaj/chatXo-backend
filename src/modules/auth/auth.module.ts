@@ -6,10 +6,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategie/local.strategy';
 import { JwtStrategy } from './strategie/jwt.strategy';
 import { RefreshToken } from './strategie/refresh-token';
+import { GithubStrategy } from './strategie/github.strategy';
+import { GoogleStrategy } from './strategie/google.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshToken],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    RefreshToken,
+    GithubStrategy,
+    GoogleStrategy,
+  ],
   imports: [
     UsersModule,
     JwtModule.register({

@@ -14,4 +14,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6)
   password: string;
+  @IsString()
+  socialId: string;
+  @IsString()
+  socialType: string;
 }

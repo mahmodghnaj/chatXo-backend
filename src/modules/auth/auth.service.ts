@@ -54,6 +54,7 @@ export class AuthService {
     const user = this.usersService.findOne({ _id: id });
     return user;
   }
+
   async getToken(infoUser: UserDocument) {
     const { id, email, firstName, lastName } = infoUser;
     const payload = { id, email, firstName, lastName };
@@ -74,5 +75,25 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async validateSocialLogin(profile: any, socialType: string): Promise<any> {
+    const { id, login, email, sub, name, family_name } = profile._json;
+    let user = await this.usersService.findOne({
+      socialId: id || sub,
+      socialType: socialType,
+    });
+
+    if (!user) {
+      user = await this.usersService.create({
+        socialId: id || sub,
+        socialType: socialType,
+        firstName: login || name,
+        lastName: family_name,
+        email: email,
+        password: '',
+      });
+    }
+    return this.getToken(user);
   }
 }

@@ -4,20 +4,26 @@ import {
   Get,
   HttpCode,
   Post,
+  Req,
   Request,
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { Public } from 'src/decorators/public';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { RefreshTokenGuard } from './guard/refresh-token.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -63,6 +69,33 @@ export class AuthController {
     });
     return tokens;
   }
+  @Public()
+  @Get('github')
+  @UseGuards(AuthGuard('github'))
+  githubLogin() {}
+
+  @Public()
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubLoginCallback(@Req() req, @Res() res) {
+    return res.redirect(
+      `${process.env.CLIENT_URL}/social?token=${req.user.accessToken}&refreshToken=${req.user.refreshToken}`,
+    );
+  }
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {}
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleLoginCallback(@Req() req, @Res() res) {
+    return res.redirect(
+      `${process.env.CLIENT_URL}/social?token=${req.user.accessToken}&refreshToken=${req.user.refreshToken}`,
+    );
+  }
+
   @Get('me')
   async me(@Request() re) {
     return await this.authService.me(re.user.id);
