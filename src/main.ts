@@ -11,7 +11,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter(), new MongoExceptionFilter());
-  app.enableCors({ origin: process.env.CLIENT_URL, credentials: true });
+  app.enableCors({
+    origin: ['http://localhost:3000', 'https://app-chat-frontend.vercel.app'],
+    credentials: true,
+  });
   app.use(cookieParser());
   await app.listen(process.env.PORT || 3001);
 }
