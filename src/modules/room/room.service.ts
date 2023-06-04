@@ -137,4 +137,25 @@ export class RoomService {
 
     return 'ok';
   }
+  async deleteRoomsAndMessagesByUserId(userId: string): Promise<any> {
+    // Find all rooms by userId
+    const rooms = await this.roomsModel.find({
+      $or: [{ user1: userId }, { user2: userId }],
+    });
+    const deleteMessagesPromises = rooms.map((room) =>
+      this.messagesModel.deleteMany({ room: room._id }),
+    );
+    await Promise.all(deleteMessagesPromises);
+    await this.roomsModel.deleteMany({
+      $or: [{ user1: userId }, { user2: userId }],
+    });
+    return 'ok';
+  }
+  async deleteById(id: string): Promise<any> {
+    // Find all rooms by userId
+    const room = await this.roomsModel.findByIdAndDelete(id);
+    if (!room) throw new HttpException('Room Not Found', 401);
+    await this.messagesModel.deleteMany({ room: id });
+    return 'ok';
+  }
 }

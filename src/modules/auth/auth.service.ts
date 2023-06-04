@@ -58,16 +58,17 @@ export class AuthService {
   async getToken(infoUser: UserDocument) {
     const { id, email, firstName, lastName } = infoUser;
     const payload = { id, email, firstName, lastName };
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: process.env.SECRET,
-        expiresIn: Number(process.env.EXPIRES_TOKEN),
-      }),
-      this.jwtService.signAsync(payload, {
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.SECRET,
+      expiresIn: Number(process.env.EXPIRES_TOKEN),
+    });
+    const refreshToken = await this.jwtService.signAsync(
+      { ...payload, accessToken },
+      {
         secret: process.env.REFRESH_TOKEN_SECRET,
         expiresIn: Number(process.env.EXPIRES_RF_TOKEN),
-      }),
-    ]);
+      },
+    );
     await this.usersService.update(payload.id, {
       refreshToken: refreshToken,
     });

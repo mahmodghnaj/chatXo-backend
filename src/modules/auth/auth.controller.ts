@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpException,
   Post,
   Req,
   Request,
@@ -94,6 +95,22 @@ export class AuthController {
     return res.redirect(
       `${process.env.CLIENT_URL}/social?token=${req.user.accessToken}&refreshToken=${req.user.refreshToken}`,
     );
+  }
+
+  @Public()
+  @UseGuards(AuthGuard('session'))
+  @Get('session')
+  async session(@Request() req) {
+    const accessToken = await this.authService.verifyAccessToken(
+      req.user.accessToken,
+    );
+    if (!accessToken) throw new HttpException('Unauthorized', 403);
+    const user = await this.authService.me(req.user.id);
+    return {
+      user,
+      refreshToken: req.cookies.refreshToken,
+      accessToken: req.user.accessToken,
+    };
   }
 
   @Get('me')

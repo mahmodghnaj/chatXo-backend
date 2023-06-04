@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategie/jwt.strategy';
 import { RefreshToken } from './strategie/refresh-token';
 import { GithubStrategy } from './strategie/github.strategy';
 import { GoogleStrategy } from './strategie/google.strategy';
+import { SessionStrategy } from './strategie/session.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -18,6 +19,7 @@ import { GoogleStrategy } from './strategie/google.strategy';
     RefreshToken,
     GithubStrategy,
     GoogleStrategy,
+    SessionStrategy,
   ],
   imports: [
     UsersModule,

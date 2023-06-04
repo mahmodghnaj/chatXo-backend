@@ -41,10 +41,16 @@ export class RoomController {
   getById(@Param() params: OnlyIDParamDTO, @Req() req) {
     return this.roomService.findOne(params.id, req.user.id);
   }
-  @Delete(':id')
-  deleteRooms() {}
+  @Delete()
+  deleteRooms(@Req() req) {
+    return this.roomService.deleteRoomsAndMessagesByUserId(req.user.id);
+  }
   @Get('/check/:id') //friend Id
   checkRoom(@Param() params: OnlyIDParamDTO, @Req() req) {
     return this.roomService.checkRoom(params.id, req.user.id);
+  }
+  @Delete(':id')
+  deleteRoom(@Param() params: OnlyIDParamDTO) {
+    return this.roomService.deleteById(params.id);
   }
 }
