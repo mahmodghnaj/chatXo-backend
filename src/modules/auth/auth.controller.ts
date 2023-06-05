@@ -25,19 +25,22 @@ export class AuthController {
     private authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
-  private setRefreshTokenCookie(res: Response, refreshToken: string) {
-    const domain = process.env.CLIENT_URL;
-    const cleanDomain = domain.replace(
-      /^(https?:\/\/)?([^:]+)(:\d+)?\.?.*$/,
-      '$2',
-    );
 
+  private cleanUrl(domain) {
+    const removeProtocolFromURL = domain.replace(/^(https?:\/\/)?/, '');
+    const lastDotIndex = removeProtocolFromURL.lastIndexOf('.');
+    if (lastDotIndex !== -1) {
+      return removeProtocolFromURL.substring(0, lastDotIndex);
+    }
+    return removeProtocolFromURL;
+  }
+  private setRefreshTokenCookie(res: Response, refreshToken: string) {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: 'none',
       secure: true,
-      domain: cleanDomain,
+      domain: this.cleanUrl(process.env.CLIENT_URL), // just backend and frontend  different domains
     });
   }
   @Public()
