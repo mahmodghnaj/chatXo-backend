@@ -27,16 +27,17 @@ export class AuthController {
   ) {}
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
     const domain = process.env.CLIENT_URL;
-    const removeProtocolFromURL = domain.replace(
-      /^(https?:\/\/)?([^:]+)(:\d+)?/,
+    const cleanDomain = domain.replace(
+      /^(https?:\/\/)?([^:]+)(:\d+)?\.?.*$/,
       '$2',
     );
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: 'none',
       secure: true,
-      domain: removeProtocolFromURL,
+      domain: cleanDomain,
     });
   }
   @Public()
