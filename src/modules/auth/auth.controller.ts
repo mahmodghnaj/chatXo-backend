@@ -25,7 +25,20 @@ export class AuthController {
     private authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
-
+  private setRefreshTokenCookie(res: Response, refreshToken: string) {
+    const domain = process.env.CLIENT_URL;
+    const removeProtocolFromURL = domain.replace(
+      /^(https?:\/\/)?([^:]+)(:\d+)?/,
+      '$2',
+    );
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      sameSite: 'none',
+      secure: true,
+      domain: removeProtocolFromURL,
+    });
+  }
   @Public()
   @Post('register')
   async register(
@@ -33,12 +46,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await await this.authService.register(body);
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      sameSite: 'none',
-      secure: true,
-    });
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
     return tokens;
   }
 
@@ -48,12 +56,7 @@ export class AuthController {
   @HttpCode(200)
   async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.authService.login(req.user);
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      sameSite: 'none',
-      secure: true,
-    });
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
     return tokens;
   }
 
@@ -68,12 +71,7 @@ export class AuthController {
       req.user.id,
       req.user.refreshToken,
     );
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      sameSite: 'none',
-      secure: true,
-    });
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
     return tokens;
   }
   @Public()

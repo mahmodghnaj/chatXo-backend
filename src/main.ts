@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter(), new MongoExceptionFilter());
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://app-chat-psi.vercel.app'],
+    origin: process.env.CLIENT_URL,
     credentials: true,
   });
   app.use(cookieParser());
