@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter(), new MongoExceptionFilter());
   app.enableCors({
-    origin: process.env.CLIENT_URL,
+    origin: 'http://localhost:3000',
     credentials: true,
   });
   app.use(cookieParser());
