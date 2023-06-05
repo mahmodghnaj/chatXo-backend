@@ -40,7 +40,7 @@ export class AuthController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: 'none',
       secure: true,
-      domain: 'http://localhost:3000', // just backend and frontend  different domains
+      domain: 'localhost:3000', // just backend and frontend  different domains
     });
   }
   @Public()
