@@ -26,21 +26,12 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  private cleanUrl(domain) {
-    const removeProtocolFromURL = domain.replace(/^(https?:\/\/)?/, '');
-    const lastDotIndex = removeProtocolFromURL.lastIndexOf('.');
-    if (lastDotIndex !== -1) {
-      return removeProtocolFromURL.substring(0, lastDotIndex);
-    }
-    return removeProtocolFromURL;
-  }
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
-      sameSite: 'none',
-      secure: true,
-      domain: 'localhost', // just backend and frontend  different domains
+      // sameSite: 'none',
+      // secure: true,
     });
   }
   @Public()
@@ -109,10 +100,11 @@ export class AuthController {
   @UseGuards(AuthGuard('session'))
   @Get('session')
   async session(@Request() req) {
+    console.log(req.user);
     const accessToken = await this.authService.verifyAccessToken(
       req.user.accessToken,
     );
-    if (!accessToken) throw new HttpException('Unauthorized', 403);
+    if (!accessToken) throw new HttpException('Unauthorized', 405);
     const user = await this.authService.me(req.user.id);
     return {
       user,

@@ -12,11 +12,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter(), new MongoExceptionFilter());
   app.enableCors({
-    origin: 'http://localhost:3000',
-
+    origin: process.env.CLIENT_URL,
     credentials: true,
   });
-  // app.use(cookieParser());
+  app.use(cookieParser());
   await app.listen(process.env.PORT || 3001);
 }
 bootstrap();
