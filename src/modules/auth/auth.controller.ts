@@ -36,11 +36,10 @@ export class AuthController {
   }
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       // sameSite: 'none',
       // secure: true,
-      domain: 'localhost', // just backend and frontend  different domains
     });
   }
   @Public()
