@@ -38,9 +38,9 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
-      sameSite: 'none',
-      secure: true,
-      domain: 'localhost:3000', // just backend and frontend  different domains
+      // sameSite: 'none',
+      // secure: true,
+      domain: 'localhost', // just backend and frontend  different domains
     });
   }
   @Public()
