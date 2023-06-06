@@ -108,7 +108,7 @@ export class AuthController {
     const user = await this.authService.me(req.user.id);
     return {
       user,
-      refreshToken: req.cookies.refreshToken,
+      refreshToken: req.cookies.refresh,
       accessToken: req.user.accessToken,
     };
   }
