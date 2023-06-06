@@ -10,15 +10,16 @@ export class SessionStrategy extends PassportStrategy(Strategy, 'session') {
     super({
       ignoreExpiration: false,
       secretOrKey: process.env.REFRESH_TOKEN_SECRET,
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          const data = request?.cookies['refresh'];
-          if (data == null) {
-            return null;
-          }
-          return data;
-        },
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // jwtFromRequest: ExtractJwt.fromExtractors([
+      //   (request: Request) => {
+      //     const data = request?.cookies['refresh'];
+      //     if (data == null) {
+      //       return null;
+      //     }
+      //     return data;
+      //   },
+      // ]),
     });
   }
   async validate(payload: any) {
