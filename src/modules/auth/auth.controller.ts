@@ -19,6 +19,10 @@ import { LocalAuthGuard } from './guard/local-auth.guard';
 import { RefreshTokenGuard } from './guard/refresh-token.guard';
 import { ConfigService } from '@nestjs/config';
 
+/**
+ * AuthController handles authentication-related endpoints such as registration, login, token refreshing, and social login via GitHub and Google.
+ * It uses various guards for authentication and access control.
+ */
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -26,6 +30,11 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
+  /**
+   * Sets the refresh token cookie in the response.
+   * @param res The HTTP response object.
+   * @param refreshToken The refresh token value.
+   */
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
     // res.cookie('refresh', refreshToken, {
     //   httpOnly: true,
@@ -34,6 +43,13 @@ export class AuthController {
     //   secure: true,
     // });
   }
+
+  /**
+   * Endpoint for user registration.
+   * @param body The request body containing user registration data.
+   * @param res The HTTP response object.
+   * @returns The authentication tokens for the registered user.
+   */
   @Public()
   @Post('register')
   async register(
@@ -45,6 +61,12 @@ export class AuthController {
     return tokens;
   }
 
+  /**
+   * Endpoint for user login.
+   * @param req The HTTP request object containing user login data.
+   * @param res The HTTP response object.
+   * @returns The authentication tokens for the logged-in user.
+   */
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -55,6 +77,12 @@ export class AuthController {
     return tokens;
   }
 
+  /**
+   * Endpoint for refreshing the access token using a refresh token.
+   * @param req The HTTP request object containing the user ID and refresh token.
+   * @param res The HTTP response object.
+   * @returns The new authentication tokens.
+   */
   @Public()
   @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
@@ -69,11 +97,23 @@ export class AuthController {
     this.setRefreshTokenCookie(res, tokens.refreshToken);
     return tokens;
   }
+
+  /**
+   * Endpoint for initiating GitHub login.
+   * Uses the GitHub authentication guard.
+   */
   @Public()
   @Get('github')
   @UseGuards(AuthGuard('github'))
   githubLogin() {}
 
+  /**
+   * Callback endpoint for GitHub login.
+   * Uses the GitHub authentication guard.
+   * @param req The HTTP request object containing the user data from GitHub.
+   * @param res The HTTP response object.
+   * @returns Redirects to the frontend with the access token and refresh token as query parameters.
+   */
   @Public()
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
@@ -82,11 +122,23 @@ export class AuthController {
       `${process.env.CLIENT_URL}/social?token=${req.user.accessToken}&refreshToken=${req.user.refreshToken}`,
     );
   }
+
+  /**
+   * Endpoint for initiating Google login.
+   * Uses the Google authentication guard.
+   */
   @Public()
   @Get('google')
   @UseGuards(AuthGuard('google'))
   googleLogin() {}
 
+  /**
+   * Callback endpoint for Google login.
+   * Uses the Google authentication guard.
+   * @param req The HTTP request object containing the user data from Google.
+   * @param res The HTTP response object.
+   * @returns Redirects to the frontend with the access token and refresh token as query parameters.
+   */
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
@@ -96,11 +148,17 @@ export class AuthController {
     );
   }
 
+  /**
+   * Endpoint for retrieving session information.
+   * Uses the session authentication guard.
+   * @param req The HTTP request object.
+   * @returns The user information and authentication tokens.
+   */
   @Public()
   @UseGuards(AuthGuard('session'))
   @Get('info-session')
   async session(@Request() req) {
-    //
+    //where domain frontend difference domain backend
     const authorizationHeader = req.headers.authorization;
     const refreshToken = authorizationHeader.split(' ')[1];
     //
@@ -117,6 +175,11 @@ export class AuthController {
     };
   }
 
+  /**
+   * Endpoint for retrieving the currently authenticated user's information.
+   * @param req The HTTP request object.
+   * @returns The user information.
+   */
   @Get('me')
   async me(@Request() re) {
     return await this.authService.me(re.user.id);
