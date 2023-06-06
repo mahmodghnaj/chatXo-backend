@@ -11,7 +11,7 @@ export class SessionStrategy extends PassportStrategy(Strategy, 'session') {
       ignoreExpiration: false,
       secretOrKey: process.env.REFRESH_TOKEN_SECRET,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // jwtFromRequest: ExtractJwt.fromExtractors([
+      // jwtFromRequest: ExtractJwt.fromExtractors([ //don't use please write commit in line 38 in auth.controller
       //   (request: Request) => {
       //     const data = request?.cookies['refresh'];
       //     if (data == null) {

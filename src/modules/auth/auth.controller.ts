@@ -18,6 +18,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
 import { RefreshTokenGuard } from './guard/refresh-token.guard';
 import { ConfigService } from '@nestjs/config';
+import { UserDocument } from '../users/schemas/user.schema';
 
 /**
  * AuthController handles authentication-related endpoints such as registration, login, token refreshing, and social login via GitHub and Google.
@@ -35,10 +36,15 @@ export class AuthController {
    * @param res The HTTP response object.
    * @param refreshToken The refresh token value.
    */
+  //where domain frontend same domain backend
+  // can see you this issus  =>
+  /**
+  https://stackoverflow.com/questions/62749492/set-cookie-was-blocked-because-its-domain-attribute-was-invalid-with-regards-to
+  */
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
     // res.cookie('refresh', refreshToken, {
     //   httpOnly: true,
-    //   maxAge: 30 * 24 * 60 * 60 * 1000,
+    //   maxAge: Number(process.env.EXPIRES_RF_TOKEN),
     //   sameSite: 'none',
     //   secure: true,
     // });
@@ -57,7 +63,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await await this.authService.register(body);
-    this.setRefreshTokenCookie(res, tokens.refreshToken);
+    // this.setRefreshTokenCookie(res, tokens.refreshToken); don't use please write commit in line 38
     return tokens;
   }
 
@@ -73,7 +79,7 @@ export class AuthController {
   @HttpCode(200)
   async login(@Request() req, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.authService.login(req.user);
-    this.setRefreshTokenCookie(res, tokens.refreshToken);
+    // this.setRefreshTokenCookie(res, tokens.refreshToken); don't use please write commit in line 38
     return tokens;
   }
 
@@ -94,7 +100,7 @@ export class AuthController {
       req.user.id,
       req.user.refreshToken,
     );
-    this.setRefreshTokenCookie(res, tokens.refreshToken);
+    //this.setRefreshTokenCookie(res, tokens.refreshToken); //don't use please write commit in line 38
     return tokens;
   }
 
@@ -165,11 +171,11 @@ export class AuthController {
     const accessToken = await this.authService.verifyAccessToken(
       req.user.accessToken,
     );
-    if (!accessToken) throw new HttpException('Unauthorized', 405);
+    if (!accessToken) throw new HttpException('Unauthorized', 401);
     const user = await this.authService.me(req.user.id);
     return {
       user,
-      //  refreshToken: req.cookies.refresh,
+      //  refreshToken: req.cookies.refresh, //don't use please write commit in line 38
       refreshToken,
       accessToken: req.user.accessToken,
     };
@@ -181,7 +187,7 @@ export class AuthController {
    * @returns The user information.
    */
   @Get('me')
-  async me(@Request() re) {
+  async me(@Request() re): Promise<UserDocument> {
     return await this.authService.me(re.user.id);
   }
 }

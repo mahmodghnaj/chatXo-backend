@@ -1,6 +1,5 @@
 import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
-  BaseWsExceptionFilter,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
@@ -29,11 +28,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly authService: AuthService,
     private readonly roomService: RoomService,
   ) {}
+
   @WebSocketServer()
   server;
 
   connectedUsers: Map<string, string> = new Map();
 
+  /**
+   * Handle a new socket connection.
+   * @param client - The socket client object.
+   */
   async handleConnection(client: Socket) {
     const token = client.handshake.auth?.token;
     const payload = this.authService.verifyAccessToken(token);
@@ -42,24 +46,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       (await this.userService.update(payload.id, {
         status: 'Online',
       }));
+
     if (!user) {
       client.disconnect(true);
       return;
     }
+
     this.connectedUsers.set(client.id, user.id);
     await this.roomService.markMessagesAsReceived(user.id);
+
     this.notifyConnectedUsers({
       id: user.id,
       status: 'Online',
       lastSeenAt: undefined,
     });
   }
+
+  /**
+   * Handle a socket disconnection.
+   * @param client - The socket client object.
+   */
   async handleDisconnect(client) {
     const userId: string = this.connectedUsers.get(client.id);
     await this.userService.update(userId, {
       status: 'Offline',
       lastSeenAt: new Date(),
     });
+
     this.connectedUsers.delete(client.id);
     this.notifyConnectedUsers({
       id: userId,
@@ -67,6 +80,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       lastSeenAt: new Date(),
     });
   }
+
+  /**
+   * Handle a message event from a socket client.
+   * @param client - The socket client object.
+   * @param addMessageDto - The DTO containing the message data.
+   */
   @SubscribeMessage('message')
   async onMessage(client: Socket, addMessageDto: AddMessageDto) {
     const userId = this.connectedUsers.get(client.id);
@@ -76,24 +95,34 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
     addMessageDto.user = userId;
     addMessageDto.received = receiverId ? true : false;
+
     const message = await this.roomService.addMessage(addMessageDto);
+
     await this.roomService.update(addMessageDto.room, {
       lastMessage: message,
       updatedAt: new Date(),
     });
-    // receiver is online
-    if (receiverId)
+
+    // Receiver is online
+    if (receiverId) {
       this.server.to(receiverId).to(client.id).emit('message', {
         message,
         idRoom: addMessageDto.room,
       });
-    else {
+    } else {
       this.server.to(client.id).emit('message', {
         message,
         idRoom: addMessageDto.room,
       });
     }
   }
+
+  /**
+   * Send a notification to connected users about the status change.
+   * @param id - The ID of the user whose status changed.
+   * @param status - The new status of the user.
+   * @param lastSeenAt - The timestamp of the user's last seen activity.
+   */
   private notifyConnectedUsers({ id, status, lastSeenAt }) {
     // Send a notification to other connected sockets
     this.connectedUsers.forEach((connectedUserId, key) => {

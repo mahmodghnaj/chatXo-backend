@@ -3,22 +3,29 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel('Users') private usersModel: Model<User>) {}
 
-  async create(body: CreateUserDto) {
+  /**
+   * Create a new user.
+   * @param body - User data.
+   * @returns The created user.
+   */
+  async create(body: CreateUserDto): Promise<UserDocument> {
     const hash = bcrypt.hashSync(body.password, 5);
     body.password = hash;
     const createdUser = new this.usersModel(body);
     return createdUser.save();
   }
-  findAll() {
-    return `This action returns all users`;
-  }
+
+  /**
+   * Find a user based on the provided query.
+   * @param body - Query parameters.
+   * @returns The found user.
+   */
   async findOne(body: object) {
     const user = await this.usersModel.findOne(body).populate({
       path: 'friends',
@@ -31,7 +38,13 @@ export class UsersService {
 
     return user;
   }
-  async validateUser(body: object) {
+
+  /**
+   * Validate and find a user based on the provided query.
+   * @param body - Query parameters.
+   * @returns The found user.
+   */
+  async validateUser(body: object): Promise<UserDocument> {
     const user = await this.usersModel
       .findOne(body)
       .select('+password +refreshToken')
@@ -39,16 +52,26 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto) {
+  /**
+   * Update a user based on the provided ID and data.
+   * @param id - User ID.
+   * @param updateUserDto - User data to update.
+   * @returns The updated user.
+   */
+  async update(id: string, updateUserDto): Promise<UserDocument> {
     const user = await this.usersModel.findByIdAndUpdate(id, updateUserDto, {
       new: true,
     });
+
     return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  /**
+   * Search for users based on the provided query and exclude the current user.
+   * @param query - Search query.
+   * @param userId - Current user ID.
+   * @returns An object containing the search result.
+   */
   async searchUsers(query: string, userId: string): Promise<{ data: User[] }> {
     if (!query)
       return {

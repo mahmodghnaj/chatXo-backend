@@ -13,6 +13,13 @@ export class RoomService {
     @InjectModel('Messages') private messagesModel: Model<Message>,
     private usersService: UsersService,
   ) {}
+
+  /**
+   * Creates a new room between two users.
+   * @param body - The room details including user1 and user2 IDs.
+   * @returns The created room details.
+   * @throws HttpException with an appropriate error message if validation fails.
+   */
   async createRoom(body): Promise<any> {
     if (body.user1 == body.user2)
       throw new HttpException("Can't Add Room With Mine", 400);
@@ -39,10 +46,23 @@ export class RoomService {
       updatedAt: res.updatedAt,
     };
   }
+
+  /**
+   * Adds a new message to a room.
+   * @param body - The message details.
+   * @returns The created message document.
+   */
   async addMessage(body: AddMessageDto): Promise<MessageDocument> {
     const createdMessage = new this.messagesModel(body);
     return await createdMessage.save();
   }
+
+  /**
+   * Retrieves a list of rooms associated with a user.
+   * @param query - The query parameters including page, limit, and total.
+   * @param userId - The ID of the user.
+   * @returns An object containing the room data and the total count.
+   */
   async getRooms(query, userId) {
     const { page, limit, total } = query;
     const skip = (page - 1) * limit;
@@ -72,10 +92,23 @@ export class RoomService {
     };
   }
 
+  /**
+   * Updates the details of a specific room.
+   * @param id - The ID of the room to update.
+   * @param updateRoomDto - The updated room details.
+   * @returns The updated room document.
+   */
   async update(id: string, updateRoomDto) {
     const room = await this.roomsModel.findByIdAndUpdate(id, updateRoomDto);
     return room;
   }
+
+  /**
+   * Retrieves the messages of a specific room.
+   * @param id - The ID of the room.
+   * @param query - The query parameters including page, limit, and total.
+   * @returns An object containing the message data and the total count.
+   */
   async getMessagesChat(id, query) {
     const { page, limit, total } = query;
     const skip = (page - 1) * limit;
@@ -93,6 +126,13 @@ export class RoomService {
       total: allTotal,
     };
   }
+
+  /**
+   * Checks if a room exists between two users and returns the room details if found.
+   * @param friendId - The ID of the friend user.
+   * @param userId - The ID of the current user.
+   * @returns An object containing the room details or null if not found.
+   */
   async checkRoom(friendId, userId) {
     const room: RoomDocument = await this.roomsModel
       .findOne({
@@ -115,6 +155,14 @@ export class RoomService {
         : null,
     };
   }
+
+  /**
+   * Retrieves the details of a specific room.
+   * @param id - The ID of the room.
+   * @param userId - The ID of the current user.
+   * @returns An object containing the room details.
+   * @throws HttpException with an appropriate error message if the room is private.
+   */
   async findOne(id: string, userId: string) {
     const res = await this.roomsModel
       .findById(id)
@@ -127,8 +175,14 @@ export class RoomService {
         user: userId == res.user1.id ? res.user2 : res.user1,
         lastMessage: res.lastMessage,
       };
-    throw new HttpException('this is room is private', 400);
+    throw new HttpException('This room is private', 400);
   }
+
+  /**
+   * Marks all unreceived messages of a user as received.
+   * @param receiverId - The ID of the receiver user.
+   * @returns 'ok' when the operation is completed.
+   */
   async markMessagesAsReceived(receiverId: string): Promise<string> {
     await this.messagesModel.updateMany(
       { receiver: receiverId, received: false },
@@ -137,8 +191,13 @@ export class RoomService {
 
     return 'ok';
   }
+
+  /**
+   * Deletes all rooms and messages associated with a user.
+   * @param userId - The ID of the user.
+   * @returns 'ok' when the operation is completed.
+   */
   async deleteRoomsAndMessagesByUserId(userId: string): Promise<any> {
-    // Find all rooms by userId
     const rooms = await this.roomsModel.find({
       $or: [{ user1: userId }, { user2: userId }],
     });
@@ -151,8 +210,14 @@ export class RoomService {
     });
     return 'ok';
   }
+
+  /**
+   * Deletes a specific room by its ID.
+   * @param id - The ID of the room to delete.
+   * @returns 'ok' when the operation is completed.
+   * @throws HttpException with an appropriate error message if the room is not found.
+   */
   async deleteById(id: string): Promise<any> {
-    // Find all rooms by userId
     const room = await this.roomsModel.findByIdAndDelete(id);
     if (!room) throw new HttpException('Room Not Found', 401);
     await this.messagesModel.deleteMany({ room: id });
