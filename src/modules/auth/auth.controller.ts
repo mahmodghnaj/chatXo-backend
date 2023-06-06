@@ -100,7 +100,10 @@ export class AuthController {
   @UseGuards(AuthGuard('session'))
   @Get('info-session')
   async session(@Request() req) {
-    console.log(req.user);
+    //
+    const authorizationHeader = req.headers.authorization;
+    const refreshToken = authorizationHeader.split(' ')[1];
+    //
     const accessToken = await this.authService.verifyAccessToken(
       req.user.accessToken,
     );
@@ -108,7 +111,8 @@ export class AuthController {
     const user = await this.authService.me(req.user.id);
     return {
       user,
-      refreshToken: req.cookies.refresh,
+      //  refreshToken: req.cookies.refresh,
+      refreshToken,
       accessToken: req.user.accessToken,
     };
   }
