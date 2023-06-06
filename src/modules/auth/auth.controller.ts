@@ -27,12 +27,12 @@ export class AuthController {
   ) {}
 
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      // sameSite: 'none',
-      // secure: true,
-    });
+    // res.cookie('refresh', refreshToken, {
+    //   httpOnly: true,
+    //   maxAge: 30 * 24 * 60 * 60 * 1000,
+    //   sameSite: 'none',
+    //   secure: true,
+    // });
   }
   @Public()
   @Post('register')
@@ -98,7 +98,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(AuthGuard('session'))
-  @Get('session')
+  @Get('info-session')
   async session(@Request() req) {
     console.log(req.user);
     const accessToken = await this.authService.verifyAccessToken(

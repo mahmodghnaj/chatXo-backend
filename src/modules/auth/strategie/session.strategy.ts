@@ -12,7 +12,7 @@ export class SessionStrategy extends PassportStrategy(Strategy, 'session') {
       secretOrKey: process.env.REFRESH_TOKEN_SECRET,
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          const data = request?.cookies['refreshToken'];
+          const data = request?.cookies['refresh'];
           if (data == null) {
             return null;
           }
