@@ -27,29 +27,7 @@ You can find the frontend source code in the [App-chat-frontend](https://github.
 
 ## Environment Variables
 
-The application uses environment variables to configure various settings. Before running the application, make sure to create a `.env.development` file in the project root directory and add the following variables:
-
-DATA_BASE=mongodb:<your-mongodb-url>
-
-SECRET=<your-jwt-secret>
-
-REFRESH_TOKEN_SECRET=<your-refresh-token-secret>
-
-PORT=<port-number>
-
-EXPIRES_TOKEN=<access-token-expiration-time>
-
-EXPIRES_RF_TOKEN=<refresh-token-expiration-time>
-
-CLIENT_ID_GITHUB=<your-github-client-id>
-CLIENT_SECRET_GITHUB=<your-github-client-secret>
-CLIENT_CALL_BACK_GITHUB=<your-github-callback-url>
-
-CLIENT_ID_GOOGLE=<your-google-client-id>
-CLIENT_SECRET_GOOGLE=<your-google-client-secret>
-CLIENT_CALL_BACK_GOOGLE=<your-google-callback-url>
-
-CLIENT_URL=<your-frontend-url>
+The application uses environment variables to configure various settings. Before running the application
 
 ## Installation
 
