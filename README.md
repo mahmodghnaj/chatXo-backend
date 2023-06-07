@@ -2,6 +2,14 @@
 
 This is a chatXo application built with Nest.js that allows two users to communicate with each other. The application supports authentication using social media accounts and provides functionality to add friends.
 
+## Demo
+
+Check out the [live demo](https://app-chat-psi.vercel.app/) of the application.
+
+## Frontend Repository
+
+You can find the frontend source code in the [App-chat-frontend](https://github.com/mahmodghnaj/App-chat-frontend) repository.
+
 ## Features
 
 - User Registration and Authentication: Users can register and log in to the application using their social media accounts.
