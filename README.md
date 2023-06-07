@@ -15,6 +15,9 @@ You can find the frontend source code in the [App-chat-frontend](https://github.
 - User Registration and Authentication: Users can register and log in to the application using their social media accounts.
 - Real-time Chat: Users can engage in real-time chat with each other, sending and receiving messages instantly.
 - Friend Management: Users can add friends to their contact list and initiate chats with them.
+- Last Seen Date: The application displays the last seen date of each user, indicating when they were last active.
+- User Status: Users' online/offline status is shown, indicating whether they are currently active or not.
+- Message Receipt: The application provides flags to indicate whether a message has been received or not.
 - Social Media Authentication: Users can authenticate using popular social media platforms such as Facebook, Google, or Twitter.
 - Secure Communication: The application ensures secure communication between users by using encryption and following best practices for data privacy and security.
 
@@ -23,7 +26,7 @@ You can find the frontend source code in the [App-chat-frontend](https://github.
 - [Nest.js](https://nestjs.com/): A powerful Node.js framework for building scalable and efficient server-side applications.
 - [Socket.IO](https://socket.io/): A library that enables real-time, bidirectional, and event-based communication between the browser and the server.
 - [Passport](http://www.passportjs.org/): A flexible authentication middleware for Node.js that supports social media authentication strategies.
-- [TypeScript](https://www.typescriptlang.org/): A strongly-typed superset of JavaScript that compiles to plain JavaScript.
+- [Mongoose](https://mongoosejs.com/): An elegant MongoDB object modeling library for Node.js.
 
 ## Environment Variables
 
