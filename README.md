@@ -1,6 +1,7 @@
 # ChatXo
 
 This is a chatXo application built with Nest.js that allows two users to communicate with each other. The application supports authentication using social media accounts and provides functionality to add friends.
+![Alt Text](./example.jpeg)
 
 ## Demo
 
