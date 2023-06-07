@@ -30,17 +30,17 @@ export class AuthController {
     private authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
-
   /**
    * Sets the refresh token cookie in the response.
    * @param res The HTTP response object.
    * @param refreshToken The refresh token value.
    */
-  //where domain frontend same domain backend
-  // can see you this issus  =>
+  // Because of domain backend different domain frontend can see you this issus  =>
   /**
   https://stackoverflow.com/questions/62749492/set-cookie-was-blocked-because-its-domain-attribute-was-invalid-with-regards-to
   */
+
+  //where domain frontend same domain backend
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
     // res.cookie('refresh', refreshToken, {
     //   httpOnly: true,
@@ -189,5 +189,11 @@ export class AuthController {
   @Get('me')
   async me(@Request() re): Promise<UserDocument> {
     return await this.authService.me(re.user.id);
+  }
+
+  @Get('logout')
+  async logout(@Request() re, @Res({ passthrough: true }) res: Response) {
+    res.clearCookie('refresh');
+    return await this.authService.logout(re.user.id);
   }
 }

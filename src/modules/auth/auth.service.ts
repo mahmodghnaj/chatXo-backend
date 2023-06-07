@@ -124,4 +124,11 @@ export class AuthService {
       refreshToken,
     };
   }
+
+  async logout(id) {
+    await this.usersService.update(id, {
+      refreshToken: null,
+    });
+    return 'ok';
+  }
 }

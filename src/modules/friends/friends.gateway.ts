@@ -10,7 +10,6 @@ import { Socket } from 'socket.io';
 import { WebsocketExceptionsFilter } from 'src/filters/ws-exception-filter';
 import { getKeyByValue } from 'src/utilities/common/helper';
 import { AuthService } from '../auth/auth.service';
-import { UsersService } from '../users/users.service';
 import { MappingFriendDto } from './dto/add-friend.dto';
 import { FriendsService } from './friends.service';
 
@@ -69,6 +68,7 @@ export class FriendsGateway
         .to(idSocketFriend)
         .emit('mappingFriend', { ...res, friendRequester: undefined });
     } else {
+      console.log('dd');
       delete res.recipient;
       this.server
         .to(client.id)
