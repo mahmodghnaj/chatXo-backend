@@ -6,7 +6,7 @@ This is a chatXo application built with Nest.js that allows two users to communi
 
 ## Demo
 
-Check out the [live demo](https://app-chat-psi.vercel.app/) of the application.
+Check out the [live demo](https://chat-xo.vercel.app/) of the application.
 
 ## Frontend Repository
 
