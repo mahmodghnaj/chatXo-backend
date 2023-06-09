@@ -5,6 +5,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { WebsocketExceptionsFilter } from 'src/filters/ws-exception-filter';
@@ -117,6 +118,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('deleteAllRooms')
+  async deleteRooms(client: Socket) {
+    const userId = this.connectedUsers.get(client.id);
+    const rooms = await this.roomService.deleteRoomsAndMessagesByUserId(userId);
+    const receivers = rooms.map((item) => ({
+      id: item.id,
+      user: item.user1.id == userId ? item.user2 : item.user1,
+    }));
+    receivers.forEach((element) => {
+      const receiverId = getKeyByValue(this.connectedUsers, element.user.id);
+      if (receiverId) {
+        this.server.to(receiverId).emit('deleteChat', element);
+      }
+    });
+    this.server.to(client.id).emit('deleteAllChat');
+  }
+
+  @SubscribeMessage('deleteChat')
+  async deleteChat(client: Socket, id: string) {
+    if (!id) throw new WsException('Please Pass Id');
+
+    const userId = this.connectedUsers.get(client.id);
+    const room = await this.roomService.deleteById(id);
+    const receiver = room.user1.id == userId ? room.user2 : room.user1;
+    const receiverId = getKeyByValue(this.connectedUsers, receiver.id);
+
+    if (receiverId) {
+      this.server
+        .to(receiverId)
+        .emit('deleteChat', { id: room.id, user: receiver });
+    }
+    this.server
+      .to(client.id)
+      .emit('deleteChat', { id: room.id, user: receiver });
+  }
   /**
    * Send a notification to connected users about the status change.
    * @param id - The ID of the user whose status changed.

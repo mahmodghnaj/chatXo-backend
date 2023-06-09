@@ -197,10 +197,15 @@ export class RoomService {
    * @param userId - The ID of the user.
    * @returns 'ok' when the operation is completed.
    */
-  async deleteRoomsAndMessagesByUserId(userId: string): Promise<any> {
-    const rooms = await this.roomsModel.find({
-      $or: [{ user1: userId }, { user2: userId }],
-    });
+  async deleteRoomsAndMessagesByUserId(
+    userId: string,
+  ): Promise<RoomDocument[]> {
+    const rooms = await this.roomsModel
+      .find({
+        $or: [{ user1: userId }, { user2: userId }],
+      })
+      .populate('user1')
+      .populate('user2');
     const deleteMessagesPromises = rooms.map((room) =>
       this.messagesModel.deleteMany({ room: room._id }),
     );
@@ -208,7 +213,7 @@ export class RoomService {
     await this.roomsModel.deleteMany({
       $or: [{ user1: userId }, { user2: userId }],
     });
-    return 'ok';
+    return rooms;
   }
 
   /**
@@ -217,10 +222,13 @@ export class RoomService {
    * @returns 'ok' when the operation is completed.
    * @throws HttpException with an appropriate error message if the room is not found.
    */
-  async deleteById(id: string): Promise<any> {
-    const room = await this.roomsModel.findByIdAndDelete(id);
+  async deleteById(id: string): Promise<RoomDocument> {
+    const room = await this.roomsModel
+      .findByIdAndDelete(id)
+      .populate('user1')
+      .populate('user2');
     if (!room) throw new HttpException('Room Not Found', 401);
     await this.messagesModel.deleteMany({ room: id });
-    return 'ok';
+    return room;
   }
 }

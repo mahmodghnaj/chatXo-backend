@@ -69,16 +69,6 @@ export class RoomController {
   }
 
   /**
-   * Delete all rooms and messages associated with the current user.
-   * @param req - The request object containing user information.
-   * @returns A Promise resolving to 'ok' when the operation is completed.
-   */
-  @Delete()
-  deleteRooms(@Req() req) {
-    return this.roomService.deleteRoomsAndMessagesByUserId(req.user.id);
-  }
-
-  /**
    * Check if a room exists between the current user and a friend.
    * @param params - The route parameters containing the friend's ID.
    * @param req - The request object containing user information.
